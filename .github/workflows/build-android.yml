@@ -28,30 +28,28 @@ jobs:
       - name: Generate native project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Decode keystore
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
-
-      - name: Build debug APK (PR)
-        if: github.event_name == 'pull_request'
+      - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
-
-      - name: Build release APK (push to main)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: android
-        env:
-          RELEASE_STORE_FILE: release.keystore
-          RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: |
-            android/app/build/outputs/apk/debug/*.apk
-            android/app/build/outputs/apk/release/*.apk
+          path: android/app/build/outputs/apk/debug/*.apk
+
+      # --- For signed release builds, uncomment below ---
+      # Add secrets: ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+      #              ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+      #
+      # - name: Decode keystore
+      #   run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+      #
+      # - name: Build release APK
+      #   working-directory: android
+      #   env:
+      #     RELEASE_STORE_FILE: release.keystore
+      #     RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      #     RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      #     RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      #   run: ./gradlew assembleRelease
