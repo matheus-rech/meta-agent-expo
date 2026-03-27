@@ -18,10 +18,9 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
-
-      - name: Rebuild native modules for macOS
-        run: npm rebuild lightningcss
+      # Use npm install (not ci) to resolve platform-specific binaries
+      # npm ci uses lockfile from Linux which lacks darwin-arm64 lightningcss
+      - run: npm install --legacy-peer-deps
 
       - name: Generate native project
         run: npx expo prebuild --platform ios --no-install
