@@ -20,6 +20,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Rebuild native modules for macOS
+        run: npm rebuild lightningcss
+
       - name: Generate native project
         run: npx expo prebuild --platform ios --no-install
 
