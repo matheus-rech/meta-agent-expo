@@ -1,0 +1,46 @@
+{
+  "name": "meta-agent-expo",
+  "version": "3.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build:web": "npx expo export -p web",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "expo": "~54.0.0",
+    "expo-clipboard": "~7.0.1",
+    "expo-constants": "~17.0.8",
+    "expo-haptics": "~14.0.1",
+    "expo-linking": "~7.0.5",
+    "expo-router": "~5.0.5",
+    "expo-secure-store": "~14.0.1",
+    "expo-splash-screen": "~0.30.0",
+    "expo-status-bar": "~2.2.3",
+    "expo-symbols": "~0.4.4",
+    "expo-system-ui": "~5.0.0",
+    "expo-web-browser": "~14.0.2",
+    "nativewind": "^4.1.23",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.1",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-safe-area-context": "~5.4.0",
+    "react-native-screens": "~4.9.2",
+    "react-native-web": "~0.20.0",
+    "react-native-webview": "13.12.5",
+    "react-native-worklets": "^0.8.1",
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}

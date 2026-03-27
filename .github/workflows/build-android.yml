@@ -1,0 +1,57 @@
+name: Build Android
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - run: npm ci
+
+      - name: Generate native project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Decode keystore
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Build debug APK (PR)
+        if: github.event_name == 'pull_request'
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Build release APK (push to main)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: android
+        env:
+          RELEASE_STORE_FILE: release.keystore
+          RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
