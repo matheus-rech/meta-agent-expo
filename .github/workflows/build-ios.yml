@@ -18,9 +18,20 @@ jobs:
           node-version: 20
           cache: npm
 
-      # Use npm install (not ci) to resolve platform-specific binaries
-      # npm ci uses lockfile from Linux which lacks darwin-arm64 lightningcss
       - run: npm install --legacy-peer-deps
+
+      - name: Fix lightningcss for macOS arm64
+        run: |
+          # lightningcss in react-native-css-interop needs the darwin-arm64 native binary
+          # npm install on Linux lockfile doesn't include it
+          CSS_LC=node_modules/react-native-css-interop/node_modules/lightningcss
+          if [ -d "$CSS_LC" ]; then
+            LCVER=$(node -p "require('./$CSS_LC/package.json').version")
+            echo "Installing lightningcss-darwin-arm64@$LCVER into $CSS_LC"
+            cd "$CSS_LC"
+            npm install "lightningcss-darwin-arm64@$LCVER" --no-save 2>&1 || true
+            ls -la *.node node_modules/lightningcss-darwin-arm64/ 2>/dev/null
+          fi
 
       - name: Generate native project
         run: npx expo prebuild --platform ios --no-install
