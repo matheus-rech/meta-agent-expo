@@ -27,18 +27,19 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Detect Xcode workspace
+      - name: Find workspace and scheme
         id: xcode
         run: |
-          WS=$(ls ios/*.xcworkspace -d | head -1)
-          SCHEME=$(basename "$WS" .xcworkspace)
-          echo "workspace=$WS" >> $GITHUB_OUTPUT
-          echo "scheme=$SCHEME" >> $GITHUB_OUTPUT
+          WORKSPACE=$(find ios -maxdepth 1 -name "*.xcworkspace" -type d | head -1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "workspace=$WORKSPACE" >> "$GITHUB_OUTPUT"
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+          echo "Found: workspace=$WORKSPACE scheme=$SCHEME"
 
       - name: Build simulator .app (no signing)
         run: |
           xcodebuild \
-            -workspace ${{ steps.xcode.outputs.workspace }} \
+            -workspace "${{ steps.xcode.outputs.workspace }}" \
             -scheme "${{ steps.xcode.outputs.scheme }}" \
             -configuration Release \
             -sdk iphonesimulator \
@@ -82,7 +83,7 @@ jobs:
       # - name: Build signed IPA
       #   run: |
       #     xcodebuild \
-      #       -workspace ${{ steps.xcode.outputs.workspace }} \
+      #       -workspace "${{ steps.xcode.outputs.workspace }}" \
       #       -scheme "${{ steps.xcode.outputs.scheme }}" \
       #       -configuration Release \
       #       -sdk iphoneos \
