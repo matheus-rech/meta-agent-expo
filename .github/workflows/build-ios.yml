@@ -30,7 +30,7 @@ jobs:
             echo "Installing lightningcss-darwin-arm64@$LCVER into $CSS_LC"
             cd "$CSS_LC"
             npm install "lightningcss-darwin-arm64@$LCVER" --no-save 2>&1 || true
-            ls -la *.node node_modules/lightningcss-darwin-arm64/ 2>/dev/null
+            ls -la node_modules/lightningcss-darwin-arm64/ 2>/dev/null || true
           fi
 
       - name: Generate native project
